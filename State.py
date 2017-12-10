@@ -55,11 +55,6 @@ class State:
             # out of board
             else:
                 reward = -1
-                # re-start
-                self.ball_x = 0.5
-                self.ball_y = 0.5
-                self.velocity_x = 0.03
-                self.velocity_y = 0.01
 
 
         # make sure the abs value is greater than 0.03
@@ -78,27 +73,30 @@ class State:
 
     def discretize_get_index(self):
         # discrete is for q learning
+        # 0-11
         discrete_paddle_y = np.floor(12 * self.paddle_y / (1 - self.paddle_height))
         discrete_paddle_y = min(discrete_paddle_y,11)
-        discrete_ball_x = int(self.ball_x*12)
-        discrete_ball_y = int(self.ball_y*12)
-        discrete_velocity_x = 1 if self.velocity_x > 0 else -1
+        # 0-11
+        discrete_ball_x = min(np.floor(self.ball_x*12),11)
+        # 0-11
+        discrete_ball_y = min(np.floor(self.ball_y*12),11)
+        # 0,1
+        discrete_velocity_x = 0 if self.velocity_x > 0 else 1
+        # 0,1,2
         if abs(self.velocity_y) < 0.015:
             discrete_velocity_y = 0
         elif self.velocity_y > 0:
             discrete_velocity_y = 1
         else:
-            discrete_velocity_y = -1
+            discrete_velocity_y = 2
 
         # set state index
         # get out off board
         if self.ball_x >1 and (self.ball_y < self.paddle_y or self.ball_y > self.paddle_y + self.paddle_height):
             index = 10369 - 1
         else:
-            index = int(discrete_ball_x + 12*discrete_ball_y +\
-                         144*((discrete_velocity_x+1)//2) +\
-                         144*2*(discrete_velocity_y+1) +\
-                         144*2*3*discrete_paddle_y)
+            index = int(discrete_ball_x + 12*discrete_ball_y + 144*discrete_velocity_x +\
+                         144*2*discrete_velocity_y + 144*2*3*discrete_paddle_y)
 
         return index
 

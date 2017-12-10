@@ -6,7 +6,7 @@ import pygame,sys
 from HardCode import *
 
 # 0 human  / 1 AI     / 2 AIs
-MODE = 1
+MODE = 2
 
 
 redColour   = pygame.Color(255,0,0)
@@ -68,7 +68,7 @@ my_paddle_y1 = 1
 ball_x = 0
 ball_y = 0
 
-Q = np.genfromtxt ('Q.csv', delimiter=",")
+Q = np.genfromtxt ('Q2000.csv', delimiter=",")
 
 while True:
     # draw walls
@@ -138,6 +138,7 @@ while True:
     reward = state.move_ball_get_rewards(my_paddle)
     if reward == -1:
         total_rewards = 0
+        state = State()
     else:
         total_rewards += reward
 

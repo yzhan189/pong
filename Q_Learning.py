@@ -24,9 +24,13 @@ s = state.discretize_get_index()
 
 
 start_time = time.time()
-while n<10000:
+while n<0:
+
+
     # terminal state
     if s == 10369-1:
+        if n % 250 == 0:
+            print(n)
         n +=1
         Q[s] += [-1,-1,-1]
         # start a new trial
@@ -60,3 +64,27 @@ end_time = time.time()
 print(end_time-start_time)
 np.savetxt("Q1000.csv", Q, delimiter=",")
 np.savetxt("N1000.csv", N, delimiter=",")
+
+
+
+Q = np.genfromtxt ('Q.csv', delimiter=",")
+print(Q)
+n = 0
+total_bounce = 0
+state = State()
+while n<1000:
+    index = state.discretize_get_index()
+    action = np.argmax(Q[index])
+    if action ==0:
+        state.move_paddle_up()
+    elif action ==2:
+        state.move_paddle_down()
+    reward = state.move_ball_get_rewards()
+    if reward==-1:
+        state = State()
+        n += 1
+    else:
+        total_bounce += reward
+
+print(total_bounce,n)
+print(total_bounce/n)
