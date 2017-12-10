@@ -8,6 +8,11 @@ gamma = 0.7
 def alpha(t):
     return 60/(59+t)
 
+def f_function(u,n):
+    if n < 7:
+        return random.randint(0,2)
+    else :
+        return u
 
 # Q(s,a) (up,stay,down)
 Q = np.zeros((10369,3))
@@ -22,14 +27,14 @@ diff = 0
 
 state = State()
 s = state.discretize_get_index()
-
+a_t = random.randint(0,2)
 
 start_time = time.time()
-while n<100:
+while n<100000:
     # terminal state
     if s == 10369-1:
         n +=1
-        Q[s] += [-1,-1,-1]
+        Q[s] = [-1,-1,-1]
         # start a new trial
         state = State()
         s = state.discretize_get_index()
@@ -37,7 +42,6 @@ while n<100:
 
     else:
         # get action
-        a_t = random.randint(0,2)
         N[s,a_t] += 1
 
         # take action change state
@@ -53,10 +57,13 @@ while n<100:
         s_prime =  state.discretize_get_index()
 
         alph = alpha(N[s,a_t])
-        Q[s,a_t] = (1-alph) * Q[s,a_t] + \
-                   alph*(r_t + gamma*np.max(Q[s_prime]))
+        a_prime = np.argmax(Q[s_prime])
+        Q[s,a_t] = Q[s,a_t] + alph*(r_t+gamma*max(Q[s_prime])-Q[s,a_t])
+        #(1-alph) * Q[s,a_t] + alph*(r_t + gamma*np.max(Q[s_prime]))
         if s != s_prime:
             diff += 1
+
+        a_t = f_function(a_prime, N[s_prime,a_prime])
         s = s_prime
         t += 1
 
@@ -67,6 +74,8 @@ np.savetxt("Q2000.csv", Q, delimiter=",")
 np.savetxt("N2000.csv", N, delimiter=",")
 
 
+
+# Q = np.genfromtxt ('foo1000.csv', delimiter=",")
 
 n = 0
 total_bounce = 0
