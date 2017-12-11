@@ -9,11 +9,15 @@ def q_learn(gamma, alpha_C,N_e):
     def alpha(t):
         return alpha_C/(alpha_C+t-1)
 
-    def f_function(u_action,n):
-        if n < N_e:
-            return random.randint(0,2)
-        else :
-            return u_action
+    def find_action(qs,ns):
+        my_q = np.zeros(3)
+        for i in range(3):
+            if ns[i] < N_e:
+                my_q[i] = 1
+            else:
+                my_q[i] = qs[i]
+
+        return np.argmax(my_q)
 
     # Q(s,a) (up,stay,down)
     Q = np.zeros((10369,3))
@@ -64,7 +68,7 @@ def q_learn(gamma, alpha_C,N_e):
             if s != s_prime:
                 diff += 1
 
-            a_t = f_function(a_prime, N[s_prime,a_prime])
+            a_t = find_action(Q[s_prime],N[s_prime])
             s = s_prime
             t += 1
 
@@ -72,8 +76,8 @@ def q_learn(gamma, alpha_C,N_e):
     print(n,t, diff)
     print(end_time-start_time)
 
-    # np.savetxt("Q3000.csv", Q, delimiter=",")
-    # np.savetxt("N3000.csv", N, delimiter=",")
+    np.savetxt("Q123.csv", Q, delimiter=",")
+    np.savetxt("N123.csv", N, delimiter=",")
 
     # Q = np.genfromtxt ('Q3000.csv', delimiter=",")
 
